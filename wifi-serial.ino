@@ -176,24 +176,14 @@ void loop() {
 		Serial.print(commsBuffer);
 		delay(SERIAL_PEER_DELAY);
 		wifiClient.println("HTTP/1.1 200 OK");
-		wifiClient.println("Content-Type: text/html");
+		wifiClient.println("Content-Type: text/plain");
 		wifiClient.println("Connection: close");
 		wifiClient.println();
-		wifiClient.println("<!DOCTYPE HTML>");
-		wifiClient.println("<html>");
-		wifiClient.print("<center><h1>");
-		wifiClient.print(apSSID);
-		wifiClient.println("</h1></center>");
-		wifiClient.print("<h2>");
-		wifiClient.print(wifiMacStr);
-		wifiClient.println("</h2>");
 		if (Serial.available()) {
-			wifiClient.println("<pre>");
 			if (userInput(NULL) != NULL)
 				wifiClient.println(commsBuffer);
-			wifiClient.println("</pre>");
 		}
-		wifiClient.println("</html>");
+		wifiClient.println();
 		delay(WIFI_CLIENT_DELAY);
 		wifiClient.stop();
 	}
