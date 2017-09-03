@@ -13,10 +13,13 @@
 
 #define BPS_HOST 9600
 #define COMMS_BUFFER_SIZE 1024
+#define SERIAL_PEER_DELAY 3000
 
 #define wifiSSID "SSID"
 #define wifiPASSWD "password"
 #define serverPORT 80
+#define AP_SUBNET 64
+#define WIFI_CLIENT_DELAY 500
 
 enum {
 	METHOD,
@@ -94,7 +97,7 @@ void wifiMacInit() {
 }
 
 void wifiAPInit() {
-	IPAddress ip(192, 168, 64, 1);
+	IPAddress ip(192, 168, AP_SUBNET, 1);
 	IPAddress mask(255,255,255,0);
 	WiFi.mode(WIFI_AP_STA);
 	WiFi.softAPConfig(ip,ip,mask);
@@ -145,6 +148,7 @@ void loop() {
 		delay(100);
 		i = j = 0;
 		readstate = METHOD;
+		commsBuffer[0] = '\0';
 		while (wifiClient.available()) {
 			char c = wifiClient.read();
 			switch (readstate) {
@@ -166,8 +170,11 @@ void loop() {
 					break;
 			}
 		}
-		Serial.println(commsBuffer);
-		delay(1500);
+		while (Serial.available()) {
+			Serial.read();
+		}
+		Serial.print(commsBuffer);
+		delay(SERIAL_PEER_DELAY);
 		wifiClient.println("HTTP/1.1 200 OK");
 		wifiClient.println("Content-Type: text/html");
 		wifiClient.println("Connection: close");
@@ -187,7 +194,7 @@ void loop() {
 			wifiClient.println("</pre>");
 		}
 		wifiClient.println("</html>");
-		delay(500);
+		delay(WIFI_CLIENT_DELAY);
 		wifiClient.stop();
 	}
 }
