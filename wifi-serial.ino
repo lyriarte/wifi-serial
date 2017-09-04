@@ -13,7 +13,7 @@
 
 #define BPS_HOST 9600
 #define COMMS_BUFFER_SIZE 1024
-#define SERIAL_PEER_DELAY 3000
+#define SERIAL_PEER_DELAY 1500
 
 #define wifiSSID "SSID"
 #define wifiPASSWD "password"
