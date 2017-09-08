@@ -12,8 +12,8 @@
  * **** **** **** **** **** ****/
 
 #define BPS_HOST 9600
-#define COMMS_BUFFER_SIZE 1024
-#define SERIAL_PEER_DELAY 1500
+#define COMMS_BUFFER_SIZE 128
+#define SERIAL_PEER_DELAY_MS 15000
 
 #define wifiSSID "SSID"
 #define wifiPASSWD "password"
@@ -124,19 +124,19 @@ bool wifiConnect(int retry) {
 }
 
 /* 
- * userIO
+ * serial peer input
  */
-char * userInput(char * message) {
-	char * input = NULL;
+void serialInput() {
+	unsigned long timeLoopStart,timeLoop;
 	int nread = 0;
-	if (message != NULL)
-		Serial.print(message);
-	while (!(nread = Serial.readBytes(commsBuffer, COMMS_BUFFER_SIZE)));
-	if (nread == COMMS_BUFFER_SIZE)
-		return input; // buffer overflow
+	timeLoopStart = timeLoop = millis();
+	// Serial timeout triggers on full commsBuffer, just wait for first command
+	while (nread == 0 && timeLoop - timeLoopStart < SERIAL_PEER_DELAY_MS) {
+		// drop older contents on buffer overflow
+		while ((nread = Serial.readBytes(commsBuffer, COMMS_BUFFER_SIZE)) == COMMS_BUFFER_SIZE);
+		timeLoop = millis();
+	}		
 	commsBuffer[nread] = 0;
-	input = commsBuffer;
-	return input;
 }
 
 void loop() {
@@ -174,15 +174,12 @@ void loop() {
 			Serial.read();
 		}
 		Serial.print(commsBuffer);
-		delay(SERIAL_PEER_DELAY);
 		wifiClient.println("HTTP/1.1 200 OK");
 		wifiClient.println("Content-Type: text/plain");
 		wifiClient.println("Connection: close");
 		wifiClient.println();
-		if (Serial.available()) {
-			if (userInput(NULL) != NULL)
-				wifiClient.println(commsBuffer);
-		}
+		serialInput();
+		wifiClient.println(commsBuffer);
 		wifiClient.println();
 		delay(WIFI_CLIENT_DELAY);
 		wifiClient.stop();
