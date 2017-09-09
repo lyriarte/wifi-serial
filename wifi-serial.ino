@@ -20,6 +20,7 @@
 #define serverPORT 80
 #define AP_SUBNET 64
 #define WIFI_CLIENT_DELAY 500
+#define WIFI_CONNECT_RETRY 10
 
 enum {
 	METHOD,
@@ -61,7 +62,7 @@ void setup() {
 	wifiMacInit();
 	Serial.print("WiFi.macAddress: ");
 	Serial.println(wifiMacStr);
-	if (!wifiConnect(5)) {
+	if (!wifiConnect(WIFI_CONNECT_RETRY)) {
 		wifiAPInit();
 		Serial.print("WiFi.softAP: ");
 		Serial.println(apSSID);
@@ -141,7 +142,7 @@ void serialInput() {
 
 void loop() {
 	int i, j, readstate;
-	if (!wifiConnect(5))
+	if (!wifiConnect(WIFI_CONNECT_RETRY))
 		wifiAPInit();
 	wifiClient = wifiServer.available();
 	if (wifiClient && wifiClient.connected()) {
