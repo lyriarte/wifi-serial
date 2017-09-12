@@ -20,6 +20,7 @@
 #define serverPORT 80
 #define AP_SUBNET 64
 #define WIFI_CLIENT_DELAY 500
+#define WIFI_CONNECT_DELAY 2000
 #define WIFI_CONNECT_RETRY 10
 
 enum {
@@ -45,7 +46,6 @@ bool wifiAPmode = false;
 char apSSID[] = "ESP_XXXXXX";
 char wifiMacStr[] = "00:00:00:00:00:00";
 byte wifiMacBuf[6];
-IPAddress wifiIP; 
 
 /* 
  * serial comms buffer
@@ -62,14 +62,8 @@ void setup() {
 	wifiMacInit();
 	Serial.print("WiFi.macAddress: ");
 	Serial.println(wifiMacStr);
-	if (!wifiConnect(WIFI_CONNECT_RETRY)) {
+	if (!wifiConnect(WIFI_CONNECT_RETRY))
 		wifiAPInit();
-		Serial.print("WiFi.softAP: ");
-		Serial.println(apSSID);
-	}
-	wifiIP = WiFi.localIP();
-	Serial.print("WiFi.localIP: ");
-	Serial.println(wifiIP);
 	wifiServer.begin();
 }
 
@@ -103,7 +97,11 @@ void wifiAPInit() {
 	WiFi.mode(WIFI_AP_STA);
 	WiFi.softAPConfig(ip,ip,mask);
 	WiFi.softAP(apSSID);
-	delay(2000);
+	Serial.print("WiFi.softAP: ");
+	Serial.println(apSSID);
+	Serial.print("WiFi server IP Address: ");
+	Serial.println(ip);
+	delay(WIFI_CONNECT_DELAY);
 	wifiAPmode = true;
 }
 
@@ -114,13 +112,20 @@ bool wifiConnect(int retry) {
 	Serial.println(wifiSSID);
 	wifiStatus = WiFi.status();
 	while (wifiStatus != WL_CONNECTED && retry != 0) {
+		if (wifiStatus != WL_IDLE_STATUS) {
+			wifiStatus = WiFi.begin(wifiSSID, wifiPASSWD);
+			Serial.print("trying..");
+			if (retry > 0)
+				retry--;
+		}
 		Serial.print(".");
-		wifiStatus = WiFi.begin(wifiSSID, wifiPASSWD);
-		delay(2000);
-		if (retry > 0)
-			retry--;
+		delay(WIFI_CONNECT_DELAY);
 	}
 	Serial.println();
+	if (wifiStatus == WL_CONNECTED) {
+		Serial.print("WiFi client IP Address: ");
+		Serial.println(WiFi.localIP());
+	}
 	return wifiStatus == WL_CONNECTED;
 }
 
