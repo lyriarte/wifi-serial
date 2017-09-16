@@ -12,7 +12,7 @@
  * **** **** **** **** **** ****/
 
 #define BPS_HOST 9600
-#define COMMS_BUFFER_SIZE 128
+#define COMMS_BUFFER_SIZE 24576
 #define SERIAL_PEER_DELAY_MS 15000
 
 #define wifiSSID "SSID"
