@@ -133,7 +133,7 @@ bool wifiConnect(int retry) {
 /* 
  * serial peer input
  */
-void serialInput() {
+int serialInput() {
 	unsigned long timeLoopStart,timeLoop;
 	int nread = 0;
 	timeLoopStart = timeLoop = millis();
@@ -144,6 +144,7 @@ void serialInput() {
 		timeLoop = millis();
 	}		
 	commsBuffer[nread] = 0;
+	return nread;
 }
 
 void serialDump() {
@@ -166,7 +167,7 @@ void serialCmd(char *cmd) {
 }
 
 void loop() {
-	int i, j, readstate;
+	int i, j, nread, readstate;
 	if (!wifiConnect(WIFI_CONNECT_RETRY))
 		wifiAPInit();
 	wifiClient = wifiServer.available();
@@ -206,8 +207,14 @@ void loop() {
 		wifiClient.println();
 		// If a command was passed on URI print the result
 		if (i) {
-			serialInput();
-			wifiClient.println(commsBuffer);
+			while (true) {
+				nread = serialInput();
+				wifiClient.println(commsBuffer);
+				// continue printing the results until the next prompt
+				if (nread > 2 && commsBuffer[nread-1] == ' ' && commsBuffer[nread-2] == ':') {
+					break;
+				}
+			}
 		}
 		// otherwise dump serial buffer contents
 		else {
