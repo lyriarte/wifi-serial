@@ -203,6 +203,7 @@ void loop() {
 			serialCmd(commsBuffer);
 		wifiClient.println("HTTP/1.1 200 OK");
 		wifiClient.println("Content-Type: text/plain");
+		wifiClient.println("Access-Control-Allow-Origin: *");
 		wifiClient.println("Connection: close");
 		wifiClient.println();
 		// If a command was passed on URI print the result
