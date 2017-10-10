@@ -16,8 +16,6 @@
 #define SERIAL_PEER_DELAY_MS 15000
 #define SERIAL_DUMP_DELAY 5000
 
-#define wifiSSID "SSID"
-#define wifiPASSWD "password"
 #define serverPORT 80
 #define AP_SUBNET 64
 #define WIFI_CLIENT_DELAY 500
@@ -42,6 +40,8 @@ enum {
 WiFiServer wifiServer(serverPORT);
 WiFiClient wifiClient;
 
+char * wifiSSIDs[] = {"SSID1", "SSID2", "SSID3"};
+char * wifiPASSWDs[] = {"pwd1", "pwd2", "pwd3"};
 int wifiStatus = WL_IDLE_STATUS;
 bool wifiAPmode = false;
 char apSSID[] = "ESP_XXXXXX";
@@ -107,8 +107,18 @@ void wifiAPInit() {
 }
 
 bool wifiConnect(int retry) {
+	int i,n;
 	if (wifiAPmode || wifiStatus == WL_CONNECTED)
 		return true;
+	n = sizeof(wifiSSIDs) / sizeof(char *);
+	for (i=0; i<n; i++) {
+		if (wifiConnectSSID(wifiSSIDs[i], wifiPASSWDs[i], retry))
+			return true;
+	}
+	return false;
+}
+
+bool wifiConnectSSID(char * wifiSSID, char * wifiPASSWD, int retry) {
 	Serial.print("Connecting to: ");
 	Serial.println(wifiSSID);
 	wifiStatus = WiFi.status();
