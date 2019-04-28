@@ -5,6 +5,7 @@
 
 
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 
 
 /* **** **** **** **** **** ****
@@ -44,7 +45,7 @@ char * wifiSSIDs[] = {"SSID1", "SSID2", "SSID3"};
 char * wifiPASSWDs[] = {"pwd1", "pwd2", "pwd3"};
 int wifiStatus = WL_IDLE_STATUS;
 bool wifiAPmode = false;
-char apSSID[] = "ESP_XXXXXX";
+char hostnameSSID[] = "ESP_XXXXXX";
 char wifiMacStr[] = "00:00:00:00:00:00";
 byte wifiMacBuf[6];
 
@@ -81,13 +82,13 @@ void wifiMacInit() {
 		if (wifiMacStr[j] > '9')
 			wifiMacStr[j] += 7;
 		if (i>2)
-			apSSID[k++] = wifiMacStr[j];
+			hostnameSSID[k++] = wifiMacStr[j];
 		++j;
 		wifiMacStr[j] = '0' + (wifiMacBuf[i] & 0x0f);
 		if (wifiMacStr[j] > '9')
 			wifiMacStr[j] += 7;
 		if (i>2)
-			apSSID[k++] = wifiMacStr[j];
+			hostnameSSID[k++] = wifiMacStr[j];
 		j+=2;
 	}
 }
@@ -97,9 +98,9 @@ void wifiAPInit() {
 	IPAddress mask(255,255,255,0);
 	WiFi.mode(WIFI_AP_STA);
 	WiFi.softAPConfig(ip,ip,mask);
-	WiFi.softAP(apSSID);
+	WiFi.softAP(hostnameSSID);
 	Serial.print("WiFi.softAP: ");
-	Serial.println(apSSID);
+	Serial.println(hostnameSSID);
 	Serial.print("WiFi server IP Address: ");
 	Serial.println(ip);
 	delay(WIFI_CONNECT_DELAY);
@@ -136,6 +137,10 @@ bool wifiConnectSSID(char * wifiSSID, char * wifiPASSWD, int retry) {
 	if (wifiStatus == WL_CONNECTED) {
 		Serial.print("WiFi client IP Address: ");
 		Serial.println(WiFi.localIP());
+		if (MDNS.begin(hostnameSSID)) {
+			Serial.print("Registered mDNS hostname: ");
+			Serial.println(hostnameSSID);
+  		}
 	}
 	return wifiStatus == WL_CONNECTED;
 }
