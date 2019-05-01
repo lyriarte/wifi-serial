@@ -20,7 +20,7 @@
 #define serverPORT 80
 #define AP_SUBNET 64
 #define WIFI_CLIENT_DELAY 500
-#define WIFI_CONNECT_DELAY 2000
+#define WIFI_CONNECT_DELAY 10000
 #define WIFI_CONNECT_RETRY 10
 
 enum {
