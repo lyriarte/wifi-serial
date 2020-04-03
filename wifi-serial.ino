@@ -130,13 +130,11 @@ bool wifiNetConnect(wifiNetInfo *net, int retry) {
 	Serial.println(net->SSID);
 	WiFi.config(net->address, net->gateway, net->netmask);  
 	wifiStatus = WiFi.status();
-	while (wifiStatus != WL_CONNECTED && retry != 0) {
-		if (wifiStatus != WL_IDLE_STATUS) {
-			wifiStatus = WiFi.begin(net->SSID, net->passwd);
-			Serial.print("trying..");
-			if (retry > 0)
-				retry--;
-		}
+	while (wifiStatus != WL_CONNECTED && retry > 0) {
+		wifiStatus = WiFi.begin(net->SSID, net->passwd);
+		Serial.print("trying..");
+		if (retry > 0)
+			retry--;
 		Serial.print(".");
 		delay(WIFI_CONNECT_DELAY);
 		wifiStatus = WiFi.status();
