@@ -22,6 +22,8 @@
 #define WIFI_CONNECT_DELAY 3000
 #define WIFI_CONNECT_RETRY 5
 
+#define LED 2
+
 enum {
 	METHOD,
 	URI,
@@ -82,6 +84,7 @@ char commsBuffer[COMMS_BUFFER_SIZE];
  * **** **** **** **** **** ****/
 
 void setup() {
+	pinMode(LED, OUTPUT);
 	Serial.begin(BPS_HOST);
 	wifiMacInit();
 	Serial.print("WiFi.macAddress: ");
@@ -116,6 +119,7 @@ bool wifiConnect(int retry) {
 	int i,n;
 	if (wifiStatus == WL_CONNECTED)
 		return true;
+	digitalWrite(LED, LOW);
 	n = sizeof(networks) / sizeof(wifiNetInfo);
 	for (i=0; i<n; i++) {
 		if (wifiNetConnect(&networks[i], retry))
@@ -135,11 +139,14 @@ bool wifiNetConnect(wifiNetInfo *net, int retry) {
 		Serial.print("trying..");
 		retry--;
 		Serial.print(".");
+		digitalWrite(LED, HIGH);
 		delay(WIFI_CONNECT_DELAY);
+		digitalWrite(LED, LOW);
 		wifiStatus = WiFi.status();
 	}
 	Serial.println();
 	if (wifiStatus == WL_CONNECTED) {
+		digitalWrite(LED, HIGH);
 		Serial.print("WiFi client IP Address: ");
 		Serial.println(WiFi.localIP());
 		if (MDNS.begin(hostnameSSID)) {
