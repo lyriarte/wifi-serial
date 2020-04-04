@@ -19,8 +19,8 @@
 
 #define serverPORT 80
 #define WIFI_CLIENT_DELAY 500
-#define WIFI_CONNECT_DELAY 5000
-#define WIFI_CONNECT_RETRY 3
+#define WIFI_CONNECT_DELAY 3000
+#define WIFI_CONNECT_RETRY 5
 
 enum {
 	METHOD,
