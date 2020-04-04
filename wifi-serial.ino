@@ -84,7 +84,9 @@ char commsBuffer[COMMS_BUFFER_SIZE];
  * **** **** **** **** **** ****/
 
 void setup() {
+#ifdef LED
 	pinMode(LED, OUTPUT);
+#endif
 	Serial.begin(BPS_HOST);
 	wifiMacInit();
 	Serial.print("WiFi.macAddress: ");
@@ -120,7 +122,9 @@ bool wifiConnect(int retry) {
 	wifiStatus = WiFi.status();
 	if (wifiStatus == WL_CONNECTED)
 		return true;
+#ifdef LED
 	digitalWrite(LED, LOW);
+#endif
 	n = sizeof(networks) / sizeof(wifiNetInfo);
 	for (i=0; i<n; i++) {
 		if (wifiNetConnect(&networks[i], retry))
@@ -140,14 +144,20 @@ bool wifiNetConnect(wifiNetInfo *net, int retry) {
 	while (wifiStatus != WL_CONNECTED && retry > 0) {
 		retry--;
 		Serial.print(".");
+#ifdef LED
 		digitalWrite(LED, HIGH);
+#endif
 		delay(WIFI_CONNECT_DELAY);
+#ifdef LED
 		digitalWrite(LED, LOW);
+#endif
 		wifiStatus = WiFi.status();
 	}
 	Serial.println();
 	if (wifiStatus == WL_CONNECTED) {
+#ifdef LED
 		digitalWrite(LED, HIGH);
+#endif
 		Serial.print("WiFi client IP Address: ");
 		Serial.println(WiFi.localIP());
 		if (MDNS.begin(hostnameSSID)) {
