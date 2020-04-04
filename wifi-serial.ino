@@ -117,6 +117,7 @@ void wifiMacInit() {
 
 bool wifiConnect(int retry) {
 	int i,n;
+	wifiStatus = WiFi.status();
 	if (wifiStatus == WL_CONNECTED)
 		return true;
 	digitalWrite(LED, LOW);
@@ -126,6 +127,7 @@ bool wifiConnect(int retry) {
 			return true;
 	}
 	WiFi.disconnect();
+	wifiStatus = WiFi.status();
 	return false;
 }
 
