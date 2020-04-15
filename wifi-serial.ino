@@ -15,11 +15,11 @@
 #define BPS_HOST 9600
 #define COMMS_BUFFER_SIZE 24576
 #define SERIAL_PEER_DELAY_MS 15000
-#define SERIAL_DUMP_DELAY 5000
+#define SERIAL_DUMP_DELAY_MS 5000
 
 #define serverPORT 80
-#define WIFI_CLIENT_DELAY 500
-#define WIFI_CONNECT_DELAY 3000
+#define WIFI_CLIENT_DELAY_MS 500
+#define WIFI_CONNECT_DELAY_MS 3000
 #define WIFI_CONNECT_RETRY 5
 
 #define LED 2
@@ -147,7 +147,7 @@ bool wifiNetConnect(wifiNetInfo *net, int retry) {
 #ifdef LED
 		digitalWrite(LED, HIGH);
 #endif
-		delay(WIFI_CONNECT_DELAY);
+		delay(WIFI_CONNECT_DELAY_MS);
 #ifdef LED
 		digitalWrite(LED, LOW);
 #endif
@@ -191,7 +191,7 @@ void serialDump() {
 		commsBuffer[nread] = 0;
 		wifiClient.print(commsBuffer);
 		// wait for more content
-		delay(SERIAL_DUMP_DELAY);
+		delay(SERIAL_DUMP_DELAY_MS);
 	}
 }
 
@@ -262,7 +262,7 @@ void loop() {
 			serialDump();
 		}
 		wifiClient.println();
-		delay(WIFI_CLIENT_DELAY);
+		delay(WIFI_CLIENT_DELAY_MS);
 		wifiClient.stop();
 	}
 }
